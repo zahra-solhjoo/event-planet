@@ -1,0 +1,71 @@
+
+from django.test import TestCase
+from rest_framework.test import APIClient
+
+from accounts.models import User
+from events.models import Event
+from registrations.models import Registration
+
+
+class EventRegistrationTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        self.participant = User.objects.create_user(
+            username="test_participant",
+            password="TestPass123!",
+            role=User.Role.PARTICIPANT,
+        )
+
+        self.organizer = User.objects.create_user(
+            username="test_organizer",
+            password="TestPass123!",
+            role=User.Role.ORGANIZER,
+        )
+
+        self.event = Event.objects.create(
+            title="Test Workshop",
+            description="Workshop for testing",
+            start_at="2026-11-15T09:00:00Z",
+            end_at="2026-11-15T12:00:00Z",
+            capacity=1,
+            organizer=self.organizer,
+            status=Event.Status.PUBLISHED,
+        )
+
+        self.client.force_authenticate(user=self.participant)
+        self.url = f"/api/registrations/events/{self.event.id}/register/"
+
+    def test_participant_can_register(self):
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(Registration.objects.count(), 1)
+
+    def test_duplicate_registration_is_rejected(self):
+        Registration.objects.create(
+            participant=self.participant,
+            event=self.event,
+        )
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Registration.objects.count(), 1)
+
+    def test_registration_fails_when_event_is_full(self):
+        another_participant = User.objects.create_user(
+            username="another_participant",
+            password="TestPass123!",
+            role=User.Role.PARTICIPANT,
+        )
+
+        Registration.objects.create(
+            participant=another_participant,
+            event=self.event,
+        )
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Registration.objects.count(), 1)
