@@ -92,3 +92,18 @@ class FeedbackTests(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(Feedback.objects.count(), 0)
+    def test_organizer_cannot_submit_feedback(self):
+        self.client.force_authenticate(user=self.organizer)
+
+        response = self.client.post(
+            self.url,
+            {
+                "registration": self.registration.id,
+                "rating": 5,
+                "comment": "Organizer feedback",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(Feedback.objects.count(), 0)

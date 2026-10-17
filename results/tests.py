@@ -52,3 +52,57 @@ class PublicEventResultTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 0)
+
+
+    def test_organizer_cannot_publish_results_for_another_organizers_event(self):
+        other_organizer = User.objects.create_user(
+            username="other_organizer",
+            password="TestPass123!",
+            role=User.Role.ORGANIZER,
+        )
+        other_event = Event.objects.create(
+            title="Another Event",
+            description="Owned by another organizer",
+            start_at="2026-11-16T09:00:00Z",
+            end_at="2026-11-16T12:00:00Z",
+            capacity=20,
+            organizer=other_organizer,
+            status=Event.Status.FINISHED,
+        )
+
+        self.client.force_authenticate(user=self.organizer)
+        response = self.client.post(
+            f"/api/organizer/events/{other_event.id}/results/",
+            {
+                "title": "Unauthorized Results",
+                "description": "Should not be published",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(
+            EventResult.objects.filter(event=other_event).exists()
+        )
+
+    def test_results_cannot_be_published_before_event_finishes(self):
+        self.event.status = Event.Status.PUBLISHED
+        self.event.save()
+
+        self.client.force_authenticate(user=self.organizer)
+        response = self.client.post(
+            f"/api/organizer/events/{self.event.id}/results/",
+            {
+                "title": "Premature Results",
+                "description": "Should not be published yet",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(
+            EventResult.objects.filter(
+                event=self.event,
+                title="Premature Results",
+            ).exists()
+        )

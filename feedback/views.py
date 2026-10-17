@@ -1,7 +1,7 @@
 
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticated
+from events.permissions import IsParticipant
 
 from events.models import Event
 from registrations.models import Registration
@@ -12,7 +12,7 @@ from .serializers import FeedbackSerializer
 
 class FeedbackListCreateView(generics.ListCreateAPIView):
     serializer_class = FeedbackSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsParticipant]
 
     def get_queryset(self):
         return Feedback.objects.filter(
