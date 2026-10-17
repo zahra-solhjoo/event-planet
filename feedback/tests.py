@@ -92,6 +92,30 @@ class FeedbackTests(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(Feedback.objects.count(), 0)
+    def test_feedback_rejected_for_another_participants_registration(self):
+        other_participant = User.objects.create_user(
+            username="another_feedback_participant",
+            password="TestPass123!",
+            role=User.Role.PARTICIPANT,
+        )
+
+        other_registration = Registration.objects.create(
+            participant=other_participant,
+            event=self.event,
+        )
+
+        response = self.client.post(
+            self.url,
+            {
+                "registration": other_registration.id,
+                "rating": 5,
+                "comment": "Unauthorized feedback",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Feedback.objects.count(), 0)
     def test_organizer_cannot_submit_feedback(self):
         self.client.force_authenticate(user=self.organizer)
 

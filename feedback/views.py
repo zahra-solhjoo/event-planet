@@ -27,10 +27,15 @@ class FeedbackListCreateView(generics.ListCreateAPIView):
 
         registration_id = serializer.validated_data["registration"]
 
-        registration = Registration.objects.get(
+        registration = Registration.objects.filter(
             id=registration_id,
             participant=self.request.user,
-        )
+        ).first()
+
+        if registration is None:
+            raise ValidationError(
+                "Registration not found for the current participant."
+            )
 
         if registration.event.status != Event.Status.FINISHED:
             raise ValidationError(
