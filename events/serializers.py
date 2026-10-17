@@ -1,7 +1,7 @@
 
 from rest_framework import serializers
 
-from .models import Event, EventAttribute, EventAttributeValue
+from .models import Event, EventAttribute, EventAttributeValue, EventStage
 
 class EventSerializer(serializers.ModelSerializer):
     organizer = serializers.ReadOnlyField(source="organizer.username")
@@ -24,6 +24,7 @@ class EventSerializer(serializers.ModelSerializer):
             "id",
             "organizer",
             "status",
+            "event",
             "created_at",
             "updated_at",
         ]
@@ -143,3 +144,41 @@ class EventAttributeValueSerializer(serializers.ModelSerializer):
             })
 
         return attrs
+
+from rest_framework import serializers
+
+from .models import EventStage
+
+
+class EventStageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventStage
+        fields = [
+            "id",
+            "event",
+            "title",
+            "description",
+            "order",
+            "start_at",
+            "end_at",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = ["id","event", "created_at", "updated_at"]
+
+    def validate(self, attrs):
+        start_at = attrs.get(
+            "start_at",
+            getattr(self.instance, "start_at", None),
+        )
+        end_at = attrs.get(
+            "end_at",
+            getattr(self.instance, "end_at", None),
+        )
+
+        if start_at and end_at and end_at <= start_at:
+            raise serializers.ValidationError(
+                "Stage end time must be later than start time."
+            )
+
+        return attrs        

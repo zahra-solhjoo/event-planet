@@ -34,6 +34,40 @@ class Event(models.Model):
         return self.title
 
 
+class EventStage(models.Model):
+    event = models.ForeignKey(
+        Event,
+        on_delete=models.CASCADE,
+        related_name="stages",
+    )
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    order = models.PositiveIntegerField()
+    start_at = models.DateTimeField()
+    end_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["order"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["event", "order"],
+                name="unique_event_stage_order",
+            ),
+        ]
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+
+        if self.end_at <= self.start_at:
+            raise ValidationError(
+                "Stage end time must be later than start time."
+            )
+
+    def __str__(self):
+        return f"{self.event.title} - {self.title}"
+
 class EventAttribute(models.Model):
     class DataType(models.TextChoices):
         TEXT = "text", "Text"

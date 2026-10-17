@@ -3,9 +3,10 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 
-from .models import Event, EventAttribute, EventAttributeValue
-from .serializers import EventSerializer
+from .models import Event, EventAttribute, EventAttributeValue, EventStage
+from .serializers import EventSerializer, EventStageSerializer
 from .serializers import EventAttributeSerializer, EventAttributeValueSerializer
 
 from django.shortcuts import get_object_or_404
@@ -110,3 +111,33 @@ class OrganizerEventAttributeValueListCreateView(generics.ListCreateAPIView):
         )
 
         serializer.save(event=event)
+
+class OrganizerEventStageListCreateView(generics.ListCreateAPIView):
+    serializer_class = EventStageSerializer
+    permission_classes = [IsAuthenticated, IsOrganizer]
+
+    def get_queryset(self):
+        return EventStage.objects.filter(
+            event__organizer=self.request.user,
+            event_id=self.kwargs["event_id"],
+        ).order_by("order")
+
+    def perform_create(self, serializer):
+        event = get_object_or_404(
+            Event,
+            pk=self.kwargs["event_id"],
+            organizer=self.request.user,
+        )
+        serializer.save(event=event)
+
+
+class OrganizerEventStageDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = EventStageSerializer
+    permission_classes = [IsAuthenticated, IsOrganizer]
+    lookup_url_kwarg = "stage_id"
+
+    def get_queryset(self):
+        return EventStage.objects.filter(
+            event__organizer=self.request.user,
+            event_id=self.kwargs["event_id"],
+        )

@@ -7,6 +7,8 @@ from .views import (
     PublicEventListView,
     OrganizerEventAttributeListCreateView,
     OrganizerEventAttributeValueListCreateView,
+    OrganizerEventStageListCreateView,
+    OrganizerEventStageDetailView,
 )
 
 
@@ -40,6 +42,16 @@ urlpatterns = [
         "organizer/events/<int:event_id>/attribute-values/",
         OrganizerEventAttributeValueListCreateView.as_view(),
         name="organizer-event-attribute-values",
+    ),
+    path(
+        "organizer/events/<int:event_id>/stages/",
+        OrganizerEventStageListCreateView.as_view(),
+        name="organizer-event-stages",
+    ),
+    path(
+        "organizer/events/<int:event_id>/stages/<int:stage_id>/",
+        OrganizerEventStageDetailView.as_view(),
+        name="organizer-event-stage-detail",
     ),
 
 ]
