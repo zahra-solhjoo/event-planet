@@ -1,7 +1,7 @@
 
 from rest_framework import generics
 from rest_framework.exceptions import ValidationError
-from events.permissions import IsParticipant
+from events.permissions import IsParticipant, IsOrganizer
 
 from events.models import Event
 from registrations.models import Registration
@@ -41,5 +41,17 @@ class FeedbackListCreateView(generics.ListCreateAPIView):
             raise ValidationError(
                 "Only active registrations can submit feedback."
             )
-
         serializer.save(registration=registration)
+
+class OrganizerEventFeedbackListView(generics.ListAPIView):
+    serializer_class = FeedbackSerializer
+    permission_classes = [IsOrganizer]
+
+    def get_queryset(self):
+        return Feedback.objects.filter(
+            registration__event__organizer=self.request.user,
+            registration__event_id=self.kwargs["event_id"],
+        ).select_related(
+            "registration__event",
+            "registration__participant",
+        )
