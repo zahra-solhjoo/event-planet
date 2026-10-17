@@ -1,7 +1,10 @@
-
 from django.urls import path
 
-from .views import EventRegistrationView, MyRegistrationsView
+from .views import (
+    EventRegistrationView,
+    MyRegistrationsView,
+    OrganizerEventRegistrationsView,
+)
 
 
 urlpatterns = [
@@ -14,5 +17,10 @@ urlpatterns = [
         "my-registrations/",
         MyRegistrationsView.as_view(),
         name="my-registrations",
+    ),
+    path(
+        "organizer/events/<int:event_id>/registrations/",
+        OrganizerEventRegistrationsView.as_view(),
+        name="organizer-event-registrations",
     ),
 ]

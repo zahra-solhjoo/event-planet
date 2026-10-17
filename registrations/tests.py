@@ -69,3 +69,67 @@ class EventRegistrationTests(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(Registration.objects.count(), 1)
+class OrganizerEventRegistrationsTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        self.organizer = User.objects.create_user(
+            username="event_organizer",
+            password="TestPass123!",
+            role=User.Role.ORGANIZER,
+        )
+
+        self.other_organizer = User.objects.create_user(
+            username="other_organizer",
+            password="TestPass123!",
+            role=User.Role.ORGANIZER,
+        )
+
+        self.participant = User.objects.create_user(
+            username="event_participant",
+            password="TestPass123!",
+            role=User.Role.PARTICIPANT,
+        )
+
+        self.event = Event.objects.create(
+            title="Organizer Workshop",
+            description="Testing participant list",
+            start_at="2026-11-15T09:00:00Z",
+            end_at="2026-11-15T12:00:00Z",
+            capacity=10,
+            organizer=self.organizer,
+            status=Event.Status.PUBLISHED,
+        )
+
+        self.registration = Registration.objects.create(
+            participant=self.participant,
+            event=self.event,
+        )
+
+        self.url = (
+            f"/api/registrations/organizer/events/"
+            f"{self.event.id}/registrations/"
+        )
+
+    def test_organizer_can_view_own_event_participants(self):
+        self.client.force_authenticate(user=self.organizer)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+    def test_other_organizer_cannot_view_event_participants(self):
+        self.client.force_authenticate(user=self.other_organizer)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+    def test_participant_cannot_view_organizer_participant_list(self):
+        self.client.force_authenticate(user=self.participant)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 403)
