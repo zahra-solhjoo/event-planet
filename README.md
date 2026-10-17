@@ -52,6 +52,7 @@ Django migrations are applied automatically when the web container starts.
 Configure the following variables in `.env`:
 
 ```env
+SECRET_KEY='replace_with_a_long_random_secret_key'
 POSTGRES_DB=event_planet
 POSTGRES_USER=event_planet_user
 POSTGRES_PASSWORD=replace_with_a_strong_password
@@ -118,8 +119,9 @@ docker compose down
 
 ### Registrations
 
-- `/api/registrations/` — Register for events and list the authenticated participant's registrations
-- `/api/registrations/organizer/events/<event_id>/registrations/` — List participants registered for an organizer's own event
+- `/api/events/<event_id>/register/` — Register for a published event
+- `/api/registrations/my-registrations/` — List the authenticated participant's registrations
+- `/api/registrations/organizer/events/<event_id>/registrations/` — List participants registered for the organizer's own event
 
 ### Feedback
 
@@ -146,7 +148,7 @@ Event attributes are defined separately from their values. The EAV model allows 
 
 ## Testing
 
-The project currently has 30 automated tests. Run them using:
+The project currently has 32 automated tests. Run them using:
 
 ```bash
 docker compose exec web python manage.py test
