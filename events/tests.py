@@ -368,3 +368,60 @@ class DynamicEventAttributeTests(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(EventAttributeValue.objects.count(), 0)
+
+class SharedDynamicAttributeTests(TestCase):
+    def setUp(self):
+        self.organizer = User.objects.create_user(
+            username="shared_attribute_organizer",
+            password="TestPass123!",
+            role=User.Role.ORGANIZER,
+        )
+
+        self.event_one = Event.objects.create(
+            title="First Event",
+            description="First event",
+            start_at="2026-11-15T09:00:00Z",
+            end_at="2026-11-15T12:00:00Z",
+            capacity=20,
+            organizer=self.organizer,
+        )
+
+        self.event_two = Event.objects.create(
+            title="Second Event",
+            description="Second event",
+            start_at="2026-11-16T09:00:00Z",
+            end_at="2026-11-16T12:00:00Z",
+            capacity=20,
+            organizer=self.organizer,
+        )
+
+        self.attribute = EventAttribute.objects.create(
+            name="Platform",
+            data_type=EventAttribute.DataType.TEXT,
+        )
+
+    def test_attribute_can_be_shared_between_events(self):
+        first_value = EventAttributeValue.objects.create(
+            event=self.event_one,
+            attribute=self.attribute,
+            text_value="Zoom",
+        )
+
+        second_value = EventAttributeValue.objects.create(
+            event=self.event_two,
+            attribute=self.attribute,
+            text_value="Google Meet",
+        )
+
+        self.assertEqual(
+            EventAttributeValue.objects.filter(
+                attribute=self.attribute,
+            ).count(),
+            2,
+        )
+
+        first_value.refresh_from_db()
+        second_value.refresh_from_db()
+
+        self.assertEqual(first_value.text_value, "Zoom")
+        self.assertEqual(second_value.text_value, "Google Meet")
