@@ -201,3 +201,90 @@ class OrganizerEventStageTests(TestCase):
         response = self.client.get(self.list_url)
 
         self.assertEqual(response.status_code, 403)
+
+class OrganizerEventStatusTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        self.organizer = User.objects.create_user(
+            username="status_organizer",
+            password="TestPass123!",
+            role=User.Role.ORGANIZER,
+        )
+
+        self.other_organizer = User.objects.create_user(
+            username="other_status_organizer",
+            password="TestPass123!",
+            role=User.Role.ORGANIZER,
+        )
+
+        self.event = Event.objects.create(
+            title="Status Test Event",
+            description="Testing event status transitions",
+            start_at="2026-11-15T09:00:00Z",
+            end_at="2026-11-15T12:00:00Z",
+            capacity=20,
+            organizer=self.organizer,
+            status=Event.Status.DRAFT,
+        )
+
+        self.url = (
+            f"/api/organizer/events/{self.event.id}/status/"
+        )
+        self.client.force_authenticate(user=self.organizer)
+
+    def test_draft_can_be_published(self):
+        response = self.client.patch(
+            self.url,
+            {"status": Event.Status.PUBLISHED},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.event.refresh_from_db()
+        self.assertEqual(
+            self.event.status,
+            Event.Status.PUBLISHED,
+        )
+
+    def test_draft_cannot_be_finished_directly(self):
+        response = self.client.patch(
+            self.url,
+            {"status": Event.Status.FINISHED},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.event.refresh_from_db()
+        self.assertEqual(self.event.status, Event.Status.DRAFT)
+
+    def test_finished_event_cannot_be_reopened(self):
+        self.event.status = Event.Status.FINISHED
+        self.event.save()
+
+        response = self.client.patch(
+            self.url,
+            {"status": Event.Status.PUBLISHED},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_organizer_cannot_change_another_organizers_event(self):
+        other_event = Event.objects.create(
+            title="Another Event",
+            description="Owned by another organizer",
+            start_at="2026-11-16T09:00:00Z",
+            end_at="2026-11-16T12:00:00Z",
+            capacity=20,
+            organizer=self.other_organizer,
+            status=Event.Status.DRAFT,
+        )
+
+        response = self.client.patch(
+            f"/api/organizer/events/{other_event.id}/status/",
+            {"status": Event.Status.PUBLISHED},
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 404)
