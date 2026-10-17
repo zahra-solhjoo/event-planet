@@ -46,7 +46,6 @@ class OrganizerEventStatusView(APIView):
             Event.Status.DRAFT: [Event.Status.PUBLISHED],
             Event.Status.PUBLISHED: [
                 Event.Status.CLOSED,
-                Event.Status.FINISHED,
             ],
             Event.Status.CLOSED: [Event.Status.FINISHED],
             Event.Status.FINISHED: [],
