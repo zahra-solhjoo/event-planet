@@ -118,11 +118,13 @@ docker compose down
 
 ### Registrations
 
-- `/api/registrations/` — Registration API
+- `/api/registrations/` — Register for events and list the authenticated participant's registrations
+- `/api/registrations/organizer/events/<event_id>/registrations/` — List participants registered for an organizer's own event
 
 ### Feedback
 
 - `/api/feedback/` — Submit and list the authenticated participant's feedback
+- `/api/feedback/organizer/events/<event_id>/feedback/` — List feedback for an organizer's own event
 
 ### Results
 
@@ -144,7 +146,7 @@ Event attributes are defined separately from their values. The EAV model allows 
 
 ## Testing
 
-The project currently has 20 automated tests. Run them using:
+The project currently has 27 automated tests. Run them using:
 
 ```bash
 docker compose exec web python manage.py test
