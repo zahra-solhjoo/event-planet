@@ -425,3 +425,17 @@ class SharedDynamicAttributeTests(TestCase):
 
         self.assertEqual(first_value.text_value, "Zoom")
         self.assertEqual(second_value.text_value, "Google Meet")
+
+    def test_duplicate_attribute_value_for_event_is_rejected(self):
+        EventAttributeValue.objects.create(
+            event=self.event_one,
+            attribute=self.attribute,
+            text_value="Zoom",
+        )
+
+        with self.assertRaises(Exception):
+            EventAttributeValue.objects.create(
+                event=self.event_one,
+                attribute=self.attribute,
+                text_value="Google Meet",
+            )

@@ -68,6 +68,38 @@ class EventStage(models.Model):
     def __str__(self):
         return f"{self.event.title} - {self.title}"
 
+class EventStageRole(models.Model):
+    class Role(models.TextChoices):
+        SPEAKER = "speaker", "Speaker"
+        JUDGE = "judge", "Judge"
+        COACH = "coach", "Coach"
+
+    stage = models.ForeignKey(
+        EventStage,
+        on_delete=models.CASCADE,
+        related_name="stage_roles",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="event_stage_roles",
+    )
+    role = models.CharField(
+        max_length=20,
+        choices=Role.choices,
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["stage", "user", "role"],
+                name="unique_event_stage_user_role",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.stage.title} - {self.user.username} - {self.role}"
+
 class EventAttribute(models.Model):
     class DataType(models.TextChoices):
         TEXT = "text", "Text"
