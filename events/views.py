@@ -85,10 +85,20 @@ class OrganizerEventAttributeListCreateView(generics.ListCreateAPIView):
     serializer_class = EventAttributeSerializer
     permission_classes = [IsOrganizer]
 
+    def get_event(self):
+        return get_object_or_404(
+            Event,
+            pk=self.kwargs["event_id"],
+            organizer=self.request.user,
+        )
+
     def get_queryset(self):
-        return EventAttribute.objects.filter(
-            event_values__event__organizer=self.request.user,
-        ).distinct()
+        self.get_event()
+        return EventAttribute.objects.all()
+
+    def perform_create(self, serializer):
+        self.get_event()
+        serializer.save()
 
 
 class OrganizerEventAttributeValueListCreateView(generics.ListCreateAPIView):

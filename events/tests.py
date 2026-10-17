@@ -288,3 +288,83 @@ class OrganizerEventStatusTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 404)
+
+from events.models import EventAttribute, EventAttributeValue
+
+
+class DynamicEventAttributeTests(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+        self.organizer = User.objects.create_user(
+            username="attribute_organizer",
+            password="TestPass123!",
+            role=User.Role.ORGANIZER,
+        )
+
+        self.event = Event.objects.create(
+            title="Dynamic Attribute Event",
+            description="Testing dynamic attributes",
+            start_at="2026-11-15T09:00:00Z",
+            end_at="2026-11-15T12:00:00Z",
+            capacity=20,
+            organizer=self.organizer,
+            status=Event.Status.DRAFT,
+        )
+
+        self.url = (
+            f"/api/organizer/events/{self.event.id}/attributes/"
+        )
+        self.client.force_authenticate(user=self.organizer)
+
+    def test_organizer_can_create_attribute(self):
+        response = self.client.post(
+            self.url,
+            {
+                "name": "Difficulty",
+                "data_type": "text",
+                "description": "Workshop difficulty",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(
+            EventAttribute.objects.filter(name="Difficulty").exists()
+        )
+
+    def test_attribute_definitions_are_independent(self):
+        attribute = EventAttribute.objects.create(
+            name="Platform",
+            data_type=EventAttribute.DataType.TEXT,
+        )
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(
+            attribute.id,
+            [item["id"] for item in response.data],
+        )
+
+    def test_attribute_value_must_match_data_type(self):
+        attribute = EventAttribute.objects.create(
+            name="Number of rounds",
+            data_type=EventAttribute.DataType.INTEGER,
+        )
+
+        value_url = (
+            f"/api/organizer/events/{self.event.id}/attribute-values/"
+        )
+
+        response = self.client.post(
+            value_url,
+            {
+                "attribute": attribute.id,
+                "text_value": "three",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(EventAttributeValue.objects.count(), 0)
