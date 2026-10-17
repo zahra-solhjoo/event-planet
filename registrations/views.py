@@ -66,8 +66,14 @@ class MyRegistrationsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        event = get_object_or_404(
+            Event,
+            pk=self.kwargs["event_id"],
+            organizer=self.request.user,
+        )
+
         return Registration.objects.filter(
-            participant=self.request.user,
+            event=event,
         ).select_related("event", "participant")
 
 class OrganizerEventRegistrationsView(generics.ListAPIView):

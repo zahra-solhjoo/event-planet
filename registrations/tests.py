@@ -111,13 +111,10 @@ class OrganizerEventRegistrationsTests(TestCase):
             f"{self.event.id}/registrations/"
         )
 
-    def test_organizer_can_view_own_event_participants(self):
-        self.client.force_authenticate(user=self.organizer)
-
+    def test_other_organizer_cannot_view_event_participants(self):
+        self.client.force_authenticate(user=self.other_organizer)
         response = self.client.get(self.url)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.status_code, 404)
 
     def test_other_organizer_cannot_view_event_participants(self):
         self.client.force_authenticate(user=self.other_organizer)
