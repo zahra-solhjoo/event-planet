@@ -154,6 +154,58 @@ The project currently has 34 automated tests. Run them using:
 docker compose exec web python manage.py test
 ```
 
+
+## Frontend
+
+The project includes a React frontend built with Vite.
+
+### Technologies
+
+- React
+- Vite
+- JavaScript
+- CSS
+
+### Requirements
+
+- Node.js
+- npm
+- The Django backend running through Docker Compose
+
+### Run the Frontend
+
+Open a new terminal in the project root and run:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Open the frontend in your browser:
+
+http://localhost:5173/
+
+The Vite development server proxies `/api` requests to the Django backend at `http://localhost:8000`.
+
+Keep the Django backend running while using the frontend.
+
+### Frontend Features
+
+- Public event listing and event details
+- User registration and token-based login
+- Participant and organizer roles
+- Organizer dashboard
+- Event creation through the Django API
+- Event status transitions through the organizer API
+
+## Running the Full Application
+
+1. Start the backend using the Docker Compose setup described above.
+2. Ensure the backend is available at `http://localhost:8000/`.
+3. Start the React frontend using the commands in the Frontend section.
+4. Open `http://localhost:5173/`.
+
 ## Git
 
-Make sure `.env`, virtual environments, and local database files are excluded from version control. Never commit real credentials or tokens.
+Make sure `.env`, virtual environments, `node_modules`, build output, and local database files are excluded from version control. Never commit real credentials or tokens.
