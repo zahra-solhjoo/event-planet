@@ -69,6 +69,44 @@ class EventRegistrationTests(TestCase):
 
         self.assertEqual(response.status_code, 400)
         self.assertEqual(Registration.objects.count(), 1)
+    def test_participant_can_only_view_own_registrations(self):
+        another_participant = User.objects.create_user(
+            username="registrations_other_participant",
+            password="TestPass123!",
+            role=User.Role.PARTICIPANT,
+        )
+
+        another_event = Event.objects.create(
+            title="Another Workshop",
+            description="Another event",
+            start_at="2026-11-16T09:00:00Z",
+            end_at="2026-11-16T12:00:00Z",
+            capacity=10,
+            organizer=self.organizer,
+            status=Event.Status.PUBLISHED,
+        )
+
+        Registration.objects.create(
+            participant=self.participant,
+            event=another_event,
+        )
+
+        Registration.objects.create(
+            participant=another_participant,
+            event=self.event,
+        )
+
+        response = self.client.get(
+            "/api/registrations/my-registrations/"
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(
+            response.data[0]["event"],
+            another_event.id,
+        )
+
 class OrganizerEventRegistrationsTests(TestCase):
     def setUp(self):
         self.client = APIClient()
@@ -116,13 +154,6 @@ class OrganizerEventRegistrationsTests(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 404)
 
-    def test_other_organizer_cannot_view_event_participants(self):
-        self.client.force_authenticate(user=self.other_organizer)
-
-        response = self.client.get(self.url)
-
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 0)
 
     def test_participant_cannot_view_organizer_participant_list(self):
         self.client.force_authenticate(user=self.participant)
