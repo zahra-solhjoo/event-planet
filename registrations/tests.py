@@ -77,7 +77,14 @@ class EventRegistrationTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertEqual(Registration.objects.count(), 0)
+    def test_registration_is_rejected_for_draft_event(self):
+        self.event.status = Event.Status.DRAFT
+        self.event.save(update_fields=["status"])
 
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(Registration.objects.count(), 0)
     def test_participant_can_only_view_own_registrations(self):
         another_participant = User.objects.create_user(
             username="registrations_other_participant",
