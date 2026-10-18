@@ -1,61 +1,93 @@
 # 🎟️ EVENT PLANET
 
-### Event Management REST API
+### Full-Stack Event Management Platform
 
-<p align="center">
-  A structured, API-first event management platform built with Django REST Framework and PostgreSQL.
-</p>
+A RESTful, API-first event management platform built with **Django REST Framework**, **PostgreSQL**, and a **React + Vite** frontend.
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python"/>
   <img src="https://img.shields.io/badge/Django-5.2-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django"/>
   <img src="https://img.shields.io/badge/DRF-REST%20API-red?style=for-the-badge" alt="Django REST Framework"/>
+  <img src="https://img.shields.io/badge/React-Frontend-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React"/>
+  <img src="https://img.shields.io/badge/Vite-Frontend-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite"/>
   <img src="https://img.shields.io/badge/PostgreSQL-Database-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL"/>
-  <img src="https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
+  <img src="https://img.shields.io/badge/Docker-Containerization-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"/>
 </p>
 
 ---
 
-## 📌 Overview
+## 📑 Table of Contents
 
-**EVENT PLANET** is an API-first event management platform designed to organize events, manage participants, coordinate multi-stage schedules, collect feedback, and publish event results.
+- [Overview](#-overview)
+- [Features](#-features)
+- [Technologies](#-technologies)
+- [Project Structure](#-project-structure)
+- [Requirements](#-requirements)
+- [Backend Setup](#-backend-setup)
+- [Environment Variables](#-environment-variables)
+- [Create a Superuser](#-create-a-superuser)
+- [Frontend Setup](#-frontend-setup)
+- [API Endpoints](#-api-endpoints)
+- [Event Lifecycle](#-event-lifecycle)
+- [Event Stages and Registration](#-event-stages-and-registration)
+- [Dynamic Attributes](#-dynamic-attributes)
+- [Testing](#-testing)
+- [Useful Commands](#-useful-commands)
+- [Git and Security](#-git-and-security)
 
-The backend is built with Django REST Framework and PostgreSQL, with token-based authentication, role-based access control, and Docker-based development.
+---
+
+## 🌍 Overview
+
+**EVENT PLANET** is a full-stack event management application that allows organizers to manage events while participants can discover events, register, and submit feedback after completion.
+
+The application follows an API-first architecture. The Django REST Framework backend manages business logic, authentication, permissions, validation, and persistence, while the React frontend communicates with the API.
+
+The project uses PostgreSQL as its database and Docker Compose to simplify local development.
 
 ## ✨ Features
 
-| Feature | Description |
+- 🔐 User registration and token-based authentication
+- 👥 Participant and Organizer roles
+- 📅 Event creation and management
+- 🔄 Event lifecycle management: Draft, Published, Closed, and Finished
+- 🧩 Multi-stage events with independent schedules and ordering
+- ⚙️ Typed Entity-Attribute-Value (EAV) model for dynamic event attributes
+- 🎟️ Event registration with capacity and duplicate-registration checks
+- ⭐ Feedback for eligible participants after event completion
+- 🏆 Event results publication
+- 🖥️ React frontend built with Vite
+- 🐘 PostgreSQL database
+- 🐳 Docker and Docker Compose support
+- 🧪 Automated backend tests
+
+## 🛠️ Technologies
+
+| Technology | Purpose |
 |---|---|
-| 🔐 Authentication | User registration and token-based login |
-| 👥 Role Management | Separate permissions for participants and organizers |
-| 📅 Event Management | Create events and manage their lifecycle |
-| 🔄 Event Lifecycle | Draft → Published → Closed → Finished |
-| 🧩 Multi-stage Events | Organize event stages and assign roles |
-| ⚙️ Dynamic Attributes | Typed event attributes without using JSON fields |
-| 🎟️ Registration | Capacity validation and duplicate-registration prevention |
-| ⭐ Feedback | Collect feedback for eligible completed events |
-| 🏆 Results | Publish and publicly display event results |
-| 🐳 Docker Support | Run the application with Docker Compose |
-
-## 🛠️ Tech Stack
-
-- **Language:** Python 3.11
-- **Backend:** Django 5.2, Django REST Framework
-- **Database:** PostgreSQL
-- **Authentication:** DRF Token Authentication
-- **Containerization:** Docker, Docker Compose
-- **Version Control:** Git and GitHub
+| Python 3.11 | Backend programming language |
+| Django 5.2 | Web framework |
+| Django REST Framework | REST API and serialization |
+| React | Frontend user interface |
+| Vite | Frontend development server and build tool |
+| JavaScript | Frontend programming language |
+| CSS | Frontend styling |
+| PostgreSQL | Relational database |
+| Docker | Application containerization |
+| Docker Compose | Local multi-container environment |
+| Git and GitHub | Version control and source hosting |
 
 ## 🏗️ Project Structure
 
 ```text
-event_planet/
-├── accounts/       # Users, registration and authentication
-├── events/         # Events, stages and dynamic attributes
-├── registrations/  # Event registration management
-├── feedback/       # Participant feedback
-├── results/        # Event results and publication
-├── config/         # Django project configuration
+event-planet/
+├── accounts/          # User accounts and authentication
+├── events/            # Events, stages and dynamic attributes
+├── registrations/     # Event registration management
+├── feedback/          # Participant feedback
+├── results/           # Event results and publication
+├── config/            # Django project configuration
+├── frontend/          # React + Vite application
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
@@ -63,14 +95,16 @@ event_planet/
 └── README.md
 ```
 
-## 🚀 Getting Started
+## 📋 Requirements
 
-### Prerequisites
-
-Make sure you have installed:
+Before starting, make sure you have installed:
 
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-- [Git](https://git-scm.com/)
+- Docker Compose
+- [Node.js and npm](https://nodejs.org/) for the frontend
+- [Git](https://git-scm.com/) to clone the repository
+
+## 🚀 Backend Setup
 
 ### 1. Clone the repository
 
@@ -81,7 +115,29 @@ cd event-planet
 
 ### 2. Configure environment variables
 
-Create a `.env` file in the project root:
+Create a `.env` file in the project root. See the [Environment Variables](#-environment-variables) section below.
+
+### 3. Build and start the backend
+
+```bash
+docker compose up --build -d
+```
+
+Docker Compose starts PostgreSQL and the Django application. Database migrations are applied automatically when the web container starts.
+
+The backend will be available at:
+
+**http://127.0.0.1:8000/**
+
+### 4. Check the backend
+
+```bash
+docker compose exec web python manage.py check
+```
+
+## 🔑 Environment Variables
+
+Create a `.env` file in the project root with the following variables:
 
 ```env
 SECRET_KEY=replace_with_a_long_random_secret_key
@@ -90,127 +146,144 @@ POSTGRES_USER=event_planet_user
 POSTGRES_PASSWORD=replace_with_a_strong_password
 ```
 
-Use your own secret key and a strong database password. Never commit your real `.env` file to GitHub.
+The application also supports `POSTGRES_HOST` and `POSTGRES_PORT`. Docker Compose configures these for the web service.
 
-### 3. Start the application
+Use a strong secret key and database password. Never commit your real `.env` file or credentials to version control.
 
-```bash
-docker compose up --build -d
-```
+## 👤 Create a Superuser
 
-The web container applies database migrations when it starts.
-
-The API will be available at:
-
-```text
-http://localhost:8000/
-```
-
-### 4. Create a superuser
+Create a Django administrator account:
 
 ```bash
 docker compose exec web python manage.py createsuperuser
 ```
 
-### 5. Run the test suite
+Follow the prompts to complete account creation.
+
+## 🖥️ Frontend Setup
+
+The project includes a React frontend powered by Vite.
+
+### 1. Navigate to the frontend directory
+
+Open a new terminal in the project root:
 
 ```bash
-docker compose exec web python manage.py test
+cd frontend
 ```
 
-### Useful Commands
+### 2. Install dependencies
 
 ```bash
-# Check the Django configuration
-docker compose exec web python manage.py check
-
-# Inspect migrations
-docker compose exec web python manage.py showmigrations
-
-# View application logs
-docker compose logs -f web
-
-# Stop the containers
-docker compose down
+npm install
 ```
 
-## 🔌 API Overview
+### 3. Start the development server
 
-All API endpoints use the `/api/` prefix.
+```bash
+npm run dev
+```
 
-### 🔐 Authentication
+Open the frontend in your browser:
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/accounts/register/` | Register a user |
-| POST | `/api/accounts/login/` | Obtain an authentication token |
-| GET | `/api/accounts/profile/` | Retrieve the authenticated user's profile |
+**http://localhost:5173/**
+
+### Frontend Technologies
+
+- React
+- Vite
+- JavaScript
+- CSS
+
+### Frontend Features
+
+- Public event listing and event details
+- User registration and token-based login
+- Participant and Organizer roles
+- Organizer dashboard
+- Event creation through the Django API
+- Event status transitions through the organizer API
+
+The Vite development server proxies `/api` requests to the Django backend at `http://localhost:8000`. Keep the backend running while using the frontend.
+
+## 🔌 API Endpoints
+
+All endpoints use the `/api/` prefix. Use the appropriate HTTP method and authentication for each operation.
+
+### 🔐 Accounts
+
+| Endpoint | Description |
+|---|---|
+| `POST /api/accounts/register/` | Register a new user |
+| `POST /api/accounts/login/` | Obtain an authentication token |
+| `GET /api/accounts/profile/` | Retrieve the authenticated user's profile |
 
 ### 📅 Events
 
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/api/events/` | List published events |
-| GET | `/api/events/<id>/` | Retrieve a published event |
-| GET / POST | `/api/organizer/events/` | List or create organizer-owned events |
-| PATCH | `/api/organizer/events/<id>/status/` | Update an event's lifecycle status |
+| Endpoint | Description |
+|---|---|
+| `GET /api/events/` | List published events |
+| `GET /api/events/<id>/` | Retrieve published event details |
+| `GET /api/organizer/events/` | List the organizer's events |
+| `POST /api/organizer/events/` | Create an event |
+| `PATCH /api/organizer/events/<id>/status/` | Update an event's status |
 
 ### 🧩 Stages and Dynamic Attributes
 
-| Endpoint | Purpose |
+| Endpoint | Description |
 |---|---|
 | `/api/organizer/events/<event_id>/stages/` | Manage event stages |
-| `/api/organizer/events/<event_id>/stages/<stage_id>/` | Retrieve or manage a stage |
-| `/api/organizer/events/<event_id>/attributes/` | Manage dynamic attribute definitions |
+| `/api/organizer/events/<event_id>/stages/<stage_id>/` | Retrieve, update, or delete a stage |
+| `/api/organizer/events/<event_id>/attributes/` | Manage attribute definitions |
 | `/api/organizer/events/<event_id>/attribute-values/` | Manage event attribute values |
 
 ### 🎟️ Registrations
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/registrations/events/<event_id>/register/` | Register for an event |
-| GET | `/api/registrations/my-registrations/` | View personal registrations |
-| GET | `/api/registrations/organizer/events/<event_id>/registrations/` | View event participants |
+| Endpoint | Description |
+|---|---|
+| `POST /api/registrations/events/<event_id>/register/` | Register for a published event |
+| `GET /api/registrations/my-registrations/` | List the authenticated participant's registrations |
+| `GET /api/registrations/organizer/events/<event_id>/registrations/` | List participants registered for the organizer's event |
 
 ### ⭐ Feedback
 
-| Endpoint | Purpose |
+| Endpoint | Description |
 |---|---|
-| `/api/feedback/` | Create feedback and list the current participant's feedback |
-| `/api/feedback/organizer/events/<event_id>/` | View feedback for an organizer-owned event |
+| `/api/feedback/` | Submit or list the authenticated participant's feedback |
+| `/api/feedback/organizer/events/<event_id>/feedback/` | List feedback for an organizer's event |
 
 ### 🏆 Results
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/organizer/events/<event_id>/results/` | Publish results for a finished event |
-| GET | `/api/results/` | List published results |
-| GET | `/api/results/<id>/` | Retrieve published result details |
+| Endpoint | Description |
+|---|---|
+| `POST /api/organizer/events/<event_id>/results/` | Publish results for an eligible event |
+| `GET /api/results/` | List published results |
+| `GET /api/results/<id>/` | Retrieve published result details |
 
-> **Note:** Protected endpoints require authentication and appropriate permissions. Requests with a body should use JSON where applicable. Consult the corresponding views and serializers for exact request and response schemas.
+> **Note:** Protected endpoints require authentication and the appropriate role. Refer to the corresponding views and serializers for exact request and response schemas.
 
 ## 🔄 Event Lifecycle
 
 Events follow a defined lifecycle:
 
 ```text
-DRAFT
-  ↓
-PUBLISHED
-  ↓
-CLOSED
-  ↓
-FINISHED
+DRAFT → PUBLISHED → CLOSED → FINISHED
 ```
 
 - **Draft:** The event is being prepared and is not publicly listed.
-- **Published:** The event is available to participants for registration.
+- **Published:** The event is publicly available and accepts registrations.
 - **Closed:** New registrations are no longer accepted.
-- **Finished:** The event has ended and can have feedback and published results.
+- **Finished:** The event has ended and can receive eligible feedback and published results.
 
-## 🧩 Dynamic Event Attributes
+## 🧩 Event Stages and Registration
 
-EVENT PLANET supports typed event attributes, allowing organizers to attach additional information to events.
+Events can contain multiple stages. Each stage belongs to one event and has its own title, description, ordering, and schedule.
+
+Registration is **event-based, not stage-based**. Participants register for the event as a whole rather than registering separately for each stage. The event's capacity applies to the total number of active registrations.
+
+## ⚙️ Dynamic Attributes
+
+EVENT PLANET uses a typed Entity-Attribute-Value (EAV) model to support flexible event attributes without adding a database column for every new attribute.
 
 Supported data types include:
 
@@ -219,46 +292,59 @@ Supported data types include:
 - Decimal
 - Boolean
 
-The data type is validated against the selected attribute, helping maintain consistent data.
+Attribute definitions are stored separately from their values, and values are validated according to their configured types.
 
 ## 🧪 Testing
 
-The project includes automated tests for core application behavior, including:
+The project currently includes **38 automated tests** covering core application behavior.
 
-- Event registration and capacity limits
-- Duplicate-registration prevention
-- User roles and access permissions
-- Event status validation
-- Feedback restrictions
-- Event result publication
-- Dynamic attribute validation and ownership checks
-
-Run the test suite with:
+Run the tests with:
 
 ```bash
 docker compose exec web python manage.py test
 ```
 
-## 🔒 Security Notes
+Check the Django configuration:
 
-- Keep secret keys and database credentials in environment variables.
-- Do not commit `.env`, local databases, virtual environments, or generated build files.
-- Use role-based permissions to protect organizer-only operations.
-- Validate input through serializers and application-level rules.
+```bash
+docker compose exec web python manage.py check
+```
 
-## 🖥️ Optional Frontend
+## 🧰 Useful Commands
 
-The backend is designed to be consumed through an API. If you use the optional React/Vite frontend included in the repository, follow its setup instructions and configure its development proxy to forward API requests to `http://localhost:8000`.
+| Task | Command |
+|---|---|
+| Start services | `docker compose up -d` |
+| Rebuild and start | `docker compose up --build -d` |
+| View application logs | `docker compose logs -f web` |
+| Run tests | `docker compose exec web python manage.py test` |
+| Check Django | `docker compose exec web python manage.py check` |
+| Show migrations | `docker compose exec web python manage.py showmigrations` |
+| Create superuser | `docker compose exec web python manage.py createsuperuser` |
+| Stop containers | `docker compose down` |
 
-## 👩‍💻 Author
+## 🔒 Git and Security
 
-**Zahra Solhjoo**
+Make sure the following are excluded from version control:
 
-- GitHub: [@zahra-solhjoo](https://github.com/zahra-solhjoo)
-- LinkedIn: [Zahra Solhjoo](https://www.linkedin.com/in/zahra-solhjoo-527965257/)
+- `.env` and other files containing secrets
+- Python virtual environments
+- `node_modules/`
+- Frontend build output
+- Local database files
+- Python cache files
+
+Never commit real credentials, secret keys, or authentication tokens.
 
 ---
 
 <p align="center">
-  Built with Python, Django REST Framework, and PostgreSQL.
+  <strong>EVENT PLANET</strong><br/>
+  Built with Python, Django REST Framework, React, and PostgreSQL.
+</p>
+
+<p align="center">
+  <a href="https://github.com/zahra-solhjoo">GitHub</a>
+  ·
+  <a href="https://www.linkedin.com/in/zahra-solhjoo-527965257/">LinkedIn</a>
 </p>
