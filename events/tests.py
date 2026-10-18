@@ -369,6 +369,49 @@ class DynamicEventAttributeTests(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(EventAttributeValue.objects.count(), 0)
 
+    def test_organizer_cannot_add_attribute_value_to_another_organizers_event(self):
+        other_organizer = User.objects.create_user(
+            username="other_attribute_organizer",
+            password="TestPass123!",
+            role=User.Role.ORGANIZER,
+        )
+
+        other_event = Event.objects.create(
+            title="Other Organizer Event",
+            description="An event owned by someone else",
+            start_at="2026-11-16T09:00:00Z",
+            end_at="2026-11-16T12:00:00Z",
+            capacity=20,
+            organizer=other_organizer,
+            status=Event.Status.DRAFT,
+        )
+
+        attribute = EventAttribute.objects.create(
+            name="Security Test",
+            data_type=EventAttribute.DataType.TEXT,
+        )
+
+        value_url = (
+            f"/api/organizer/events/{other_event.id}/attribute-values/"
+        )
+
+        response = self.client.post(
+            value_url,
+            {
+                "attribute": attribute.id,
+                "text_value": "Unauthorized value",
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(
+            EventAttributeValue.objects.filter(
+                event=other_event,
+                attribute=attribute,
+            ).exists()
+        )
+
 class SharedDynamicAttributeTests(TestCase):
     def setUp(self):
         self.organizer = User.objects.create_user(

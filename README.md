@@ -148,7 +148,7 @@ Event attributes are defined separately from their values. The EAV model allows 
 
 ## Testing
 
-The project currently has 37 automated tests. Run them using:
+The project currently has 38 automated tests. Run them using:
 
 ```bash
 docker compose exec web python manage.py test
