@@ -55,7 +55,19 @@ class FeedbackTests(TestCase):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Feedback.objects.count(), 1)
+    def test_feedback_rejects_rating_above_five(self):
+        response = self.client.post(
+            self.url,
+            {
+                "registration": self.registration.id,
+                "rating": 6,
+                "comment": "Invalid rating",
+            },
+            format="json",
+        )
 
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Feedback.objects.count(), 0)
     def test_duplicate_feedback_is_rejected(self):
         Feedback.objects.create(
             registration=self.registration,
