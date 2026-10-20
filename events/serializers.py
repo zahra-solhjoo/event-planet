@@ -46,14 +46,10 @@ class EventSerializer(serializers.ModelSerializer):
 
         return attrs
 
-
-
-
 class EventAttributeSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventAttribute
         fields = ["id", "name", "data_type", "description"]
-
 
 class EventAttributeValueSerializer(serializers.ModelSerializer):
     attribute_name = serializers.CharField(
@@ -144,11 +140,6 @@ class EventAttributeValueSerializer(serializers.ModelSerializer):
             })
 
         return attrs
-
-from rest_framework import serializers
-
-from .models import EventStage
-
 
 class EventStageSerializer(serializers.ModelSerializer):
     class Meta:
