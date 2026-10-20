@@ -44,9 +44,7 @@ class OrganizerEventStatusView(APIView):
 
         allowed_transitions = {
             Event.Status.DRAFT: [Event.Status.PUBLISHED],
-            Event.Status.PUBLISHED: [
-                Event.Status.CLOSED,
-            ],
+            Event.Status.PUBLISHED: [Event.Status.CLOSED,],
             Event.Status.CLOSED: [Event.Status.FINISHED],
             Event.Status.FINISHED: [],
         }
@@ -138,7 +136,6 @@ class OrganizerEventStageListCreateView(generics.ListCreateAPIView):
             organizer=self.request.user,
         )
         serializer.save(event=event)
-
 
 class OrganizerEventStageDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = EventStageSerializer

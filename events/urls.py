@@ -31,6 +31,8 @@ urlpatterns = [
     path(
         "organizer/events/<int:pk>/status/",
         OrganizerEventStatusView.as_view(),
+        name="organizer-event-status",
+
     ),
 
     path(

@@ -23,7 +23,6 @@ class FeedbackListCreateView(generics.ListCreateAPIView):
         )
 
     def perform_create(self, serializer):
-        from registrations.models import Registration
 
         registration_id = serializer.validated_data["registration"]
 

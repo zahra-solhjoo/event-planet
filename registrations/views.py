@@ -60,7 +60,6 @@ class EventRegistrationView(APIView):
             status=status.HTTP_201_CREATED,
         )
 
-
 class MyRegistrationsView(generics.ListAPIView):
     serializer_class = RegistrationSerializer
     permission_classes = [IsAuthenticated]
@@ -87,8 +86,6 @@ class OrganizerEventRegistrationsView(generics.ListAPIView):
 
     def list(self, request, *args, **kwargs):
         if request.user.role != "organizer":
-            from rest_framework.exceptions import PermissionDenied
-
             raise PermissionDenied(
                 "Only organizers can view event participants."
             )
