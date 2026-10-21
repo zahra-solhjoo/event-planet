@@ -58,7 +58,6 @@ class EventStage(models.Model):
         ]
 
     def clean(self):
-        from django.core.exceptions import ValidationError
 
         if self.end_at <= self.start_at:
             raise ValidationError(
